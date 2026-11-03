@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://28ho2132-tech.github.io/gwongrigeum/sitemap.xml

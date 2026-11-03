@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<title>창업 손익분기점 계산기 | 월 손익분기 매출·하루 매출·회수기간</title>
+<meta name="description" content="월세, 인건비, 변동비율을 넣으면 한 달 손익분기 매출, 하루 매출, 객단가별 손님 수, 투자금 회수기간을 계산합니다." />
+<link rel="canonical" href="https://28ho2132-tech.github.io/gwongrigeum/breakeven/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="창업 손익분기 계산기" />
+<meta property="og:description" content="월세, 인건비, 변동비율을 넣으면 한 달 손익분기 매출, 하루 매출, 객단가별 손님 수, 투자금 회수기간을 계산합니다." />
+<meta property="og:image" content="https://28ho2132-tech.github.io/gwongrigeum/og.png" />
+<meta property="og:url" content="https://28ho2132-tech.github.io/gwongrigeum/breakeven/" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" href="../favicon.png" />
+<link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <script type="module" crossorigin src="../assets/breakeven-C93sAYhJ.js"></script>
+  <link rel="modulepreload" crossorigin href="../assets/common-B6t_JRtG.js">
+  <link rel="modulepreload" crossorigin href="../assets/calc-C6wHTwtL.js">
+  <link rel="stylesheet" crossorigin href="../assets/common-DXPcMEL5.css">
+</head>
+<body>
+<header class="site-head"><div class="site-head-in"><a class="brand" href="../"><b>상가 계산기</b><small>더키부동산</small></a><nav aria-label="주요 메뉴"><a href="../goodwill/">권리금 계산기</a><a href="../brokerage/">중개보수</a><a href="../protection/">상가임대차보호법</a><a href="../yield/">투자수익률</a><a href="../breakeven/" aria-current="page">손익분기</a></nav></div></header>
+<main class="wrap">
+  <h1 class="page-title">창업 손익분기 계산기</h1>
+  <p class="page-sub">월 고정비와 변동비율을 넣으면 한 달에 얼마를 팔아야 본전인지, 하루에 몇 명이 와야 하는지 계산합니다.</p>
+  <div class="grid">
+    <form class="panel" id="form" autocomplete="off" novalidate>
+      <fieldset>
+        <legend>월 고정비 (매출과 관계없이 나가는 돈)</legend>
+        <div class="row">
+          <label for="rent">월세
+            <span class="inp"><input id="rent" type="number" inputmode="decimal" min="0" placeholder="250"><span class="u">만원</span></span></label>
+          <label for="mgmt">관리비·공과금
+            <span class="inp"><input id="mgmt" type="number" inputmode="decimal" min="0" placeholder="50"><span class="u">만원</span></span></label>
+          <label for="labor">직원 인건비
+            <span class="inp"><input id="labor" type="number" inputmode="decimal" min="0" placeholder="600"><span class="u">만원</span></span></label>
+          <label for="ownerPay">사장 본인 월 가져갈 돈
+            <span class="inp"><input id="ownerPay" type="number" inputmode="decimal" min="0" placeholder="300"><span class="u">만원</span></span></label>
+          <label for="other">그 밖의 고정비 (대출이자·보험 등)
+            <span class="inp"><input id="other" type="number" inputmode="decimal" min="0" placeholder="50"><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint">사장님이 일해서 가져갈 돈을 넣으면 "내 월급까지 나오는 매출"이 손익분기가 됩니다. 0으로 두면 가게 자체의 본전입니다.</p>
+      </fieldset>
+      <fieldset>
+        <legend>변동비와 예상 매출</legend>
+        <div class="row">
+          <label for="varPct">매출 대비 변동비 (재료비·수수료 등)
+            <span class="inp"><input id="varPct" type="number" inputmode="decimal" min="0" step="0.5" placeholder="35"><span class="u">%</span></span></label>
+          <label for="sales">예상 월 매출
+            <span class="inp"><input id="sales" type="number" inputmode="decimal" min="0" placeholder="2500"><span class="u">만원</span></span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>영업일과 객단가 (선택)</legend>
+        <div class="row">
+          <label for="days">한 달 영업일
+            <span class="inp"><input id="days" type="number" inputmode="decimal" min="0" placeholder="26"><span class="u">일</span></span></label>
+          <label for="ticket">손님 1명 평균 결제액
+            <span class="inp"><input id="ticket" type="number" inputmode="decimal" min="0" placeholder="12000"><span class="u">원</span></span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>투자금과 목표 (선택)</legend>
+        <div class="row">
+          <label for="initial">초기 투자금 (보증금 제외 권리금·시설·인테리어)
+            <span class="inp"><input id="initial" type="number" inputmode="decimal" min="0" placeholder="8000"><span class="u">만원</span></span></label>
+          <label for="target">월 목표 이익
+            <span class="inp"><input id="target" type="number" inputmode="decimal" min="0" placeholder="500"><span class="u">만원</span></span></label>
+        </div>
+      </fieldset>
+    </form>
+    <aside class="sticky"><div class="stack" id="result"></div></aside>
+  </div>
+  <div class="cta" id="cta" hidden></div>
+
+  <article class="prose" style="padding:0">
+    <h2>손익분기점이란</h2>
+    <p>매출이 월 고정비와 변동비를 모두 덮어 이익이 0이 되는 매출입니다. 계산식은 <b>월 고정비 ÷ (1 − 변동비율)</b>입니다. 변동비율은 매출이 늘면 같이 늘어나는 비용(재료비, 카드 수수료, 배달 수수료 등)이 매출에서 차지하는 비율입니다.</p>
+    <div class="ex">고정비가 월 1,250만원, 변동비율이 35%면 손익분기 매출은 1,250 ÷ 0.65 = <b>약 1,923만원</b>입니다. 예상 매출이 2,500만원이면 이익은 2,500 × 0.65 − 1,250 = <b>375만원</b>입니다.</div>
+    <h2>창업 전에 확인할 것</h2>
+    <ul>
+      <li>고정비에 <b>사장 본인의 월급</b>을 넣었는지. 빼면 실제로는 일하고도 남는 돈이 없는 가게가 본전으로 보입니다.</li>
+      <li>예상 매출을 <b>비슷한 업종의 실제 매출</b>로 확인했는지. 가장 크게 틀리는 숫자입니다.</li>
+      <li>초기 투자금에는 인수한다면 <b>권리금</b>, 시설·인테리어비를 넣고 돌려받는 보증금은 빼는 것이 보통입니다. 권리금 구성은 <a href="../goodwill/">권리금 계산기</a>에서 정리할 수 있습니다.</li>
+    </ul>
+    <p class="src">입력한 숫자를 그대로 계산하는 도구이며 매출을 보장하지 않습니다. 세금과 4대보험은 직접 고정비에 넣어 주세요.</p>
+  </article>
+</main>
+<footer class="site-foot"><div class="site-foot-in"><p>이 사이트의 계산 결과는 입력하신 값을 바탕으로 한 참고용이며 감정평가·법률 자문이 아닙니다. 법령과 요율은 2026년 11월 3일 기준으로 확인했고, 실제 거래 전에는 국가법령정보센터(law.go.kr)와 전문가를 통해 다시 확인하세요.</p><p>입력하신 내용은 이 기기에만 저장되며 서버로 보내지 않습니다. 운영: 더키부동산(세종)</p></div></footer>
+</body>
+</html>
