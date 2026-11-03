@@ -1,0 +1,214 @@
+<div class="wrap">
+  <header class="top no-print">
+    <div>
+      <h1>권리금 계산기</h1>
+      <p class="sub">권리금을 근거와 함께 계산하고, 상대방에게 건넬 보고서를 만듭니다.</p>
+    </div>
+    <div class="topr">
+      <button class="link" type="button" id="sample">예시로 채워보기</button>
+      <button class="link" type="button" id="clear">모두 지우기</button>
+      
+    </div>
+  </header>
+  <div class="banner" id="banner" hidden></div>
+
+  <div class="switches no-print">
+    <div class="tabs" role="tablist" aria-label="이용 목적">
+      <button role="tab" id="tab-seller" aria-selected="true">가게를 넘기려는 사장님</button>
+      <button role="tab" id="tab-buyer" aria-selected="false">가게를 인수하려는 분</button>
+    </div>
+    <div class="tabs b-only" role="tablist" aria-label="인수 방식">
+      <button role="tab" id="type-g" aria-selected="true">같은 업종으로 이어받기<small>영업형: 지금 장사를 그대로 이어받음</small></button>
+      <button role="tab" id="type-f" aria-selected="false">업종 바꿔 들어가기<small>시설형: 시설만 다시 씀</small></button>
+    </div>
+  </div>
+
+  <div class="grid no-print">
+    <form class="panel" id="form" autocomplete="off" novalidate>
+      <fieldset>
+        <legend>가게 정보</legend>
+        <div class="row">
+          <label for="name"><span>상호 <span class="req">*</span></span>
+            <span class="inp"><input id="name" placeholder="예: 도담동 ○○카페" data-req></span></label>
+          <label for="loc">위치
+            <span class="inp"><input id="loc" placeholder="예: 세종시 도담동 ○○상가 1층"></span></label>
+          <label for="bizName">현재 업종
+            <span class="inp"><input id="bizName" placeholder="예: 카페"></span></label>
+          <label for="area">전용면적
+            <span class="inp"><input id="area" type="number" inputmode="decimal" min="0" placeholder="예: 25"><span class="u">평</span></span></label>
+          <label for="author" style="grid-column:1/-1">작성 (중개사무소 이름·연락처, 선택)
+            <span class="inp"><input id="author" placeholder="예: ○○부동산 044-000-0000"></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>임대 조건 (현재)</legend>
+        <div class="row three">
+          <label for="deposit">보증금
+            <span class="inp"><input id="deposit" type="number" inputmode="numeric" min="0" placeholder="3000"><span class="u">만원</span></span></label>
+          <label for="rent">월세
+            <span class="inp"><input id="rent" type="number" inputmode="numeric" min="0" placeholder="250"><span class="u">만원</span></span></label>
+          <label for="mgmt">관리비
+            <span class="inp"><input id="mgmt" type="number" inputmode="numeric" min="0" placeholder="30"><span class="u">만원</span></span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>바닥권리금 (자리값)</legend>
+        <div class="row">
+          <label for="floor"><span>바닥권리금 <span class="req">*</span></span>
+            <span class="inp"><input id="floor" type="number" inputmode="numeric" min="0" placeholder="없으면 0" data-req><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint">같은 상권·같은 층 비슷한 가게 시세입니다. 상권에 붙은 가치라, 인수자가 나중에 나갈 때 다시 받을 수 있는 돈으로 봅니다.</p>
+      </fieldset>
+
+      <!-- 장사 실적 -->
+      <fieldset class="g-only">
+        <legend>장사 실적 <span class="s-inline">· 장사가 잘되면 꼭 넣으세요</span></legend>
+        <div class="row" id="plSimple">
+          <label for="sales">월 평균 매출
+            <span class="inp"><input id="sales" type="number" inputmode="numeric" min="0" placeholder="2600"><span class="u">만원</span></span></label>
+          <label for="profit">월 순수익
+            <span class="inp"><input id="profit" type="number" inputmode="numeric" placeholder="1020"><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint" id="plSimpleHint">월 순수익은 재료비·인건비·월세·관리비까지 다 내고 한 달에 남는 돈입니다.</p>
+        <label class="check"><input type="checkbox" id="plDetail"> 비용을 항목별로 나눠 입력하기</label>
+        <div id="plDetailBox" hidden>
+          <div class="row">
+            <label for="cogs">재료비·원가
+              <span class="inp"><input id="cogs" type="number" inputmode="numeric" min="0" placeholder="700"><span class="u">만원</span></span></label>
+            <label for="wage">직원 인건비
+              <span class="inp"><input id="wage" type="number" inputmode="numeric" min="0" placeholder="450"><span class="u">만원</span></span></label>
+            <label for="etc">기타 비용 (공과금·카드수수료 등)
+              <span class="inp"><input id="etc" type="number" inputmode="numeric" min="0" placeholder="150"><span class="u">만원</span></span></label>
+          </div>
+          <p class="hint">월 순수익 = 매출 − 위 비용 − 월세 − 관리비로 자동 계산됩니다.</p>
+          <label class="check s-only"><input type="checkbox" id="showCost" checked> 보고서에 비용 항목까지 공개</label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label for="ownerMode">사장님이 직접 일하나요?
+            <span class="inp"><select id="ownerMode">
+              <option value="work">네, 풀타임으로 일함</option>
+              <option value="part">일부만 (관리·마감 등)</option>
+              <option value="auto">아니요, 직원이 운영 (오토)</option>
+            </select></span></label>
+          <label for="owner">사장님 대신 사람을 쓰면 드는 돈
+            <span class="inp"><input id="owner" type="number" inputmode="numeric" min="0" value="300"><span class="u">만원/월</span></span></label>
+        </div>
+        <p class="hint">사장님이 직접 일해서 남는 돈에는 사장님 몫의 노동이 들어 있습니다. 인수자 회수기간은 이 금액을 뺀 이익으로 계산합니다.</p>
+      </fieldset>
+
+      <fieldset class="sg">
+        <legend>영업권리금</legend>
+        <div class="row">
+          <label for="months">순수익 몇 개월치를 받을지
+            <span class="inp"><input id="months" type="number" inputmode="numeric" min="0" max="36" value="10"><span class="u">개월치</span></span></label>
+          <label for="basis">개월치의 기준
+            <span class="inp"><select id="basis">
+              <option value="op">월 순수익 (시장 관행)</option>
+              <option value="excess">월 순수익 − 사람 쓰는 비용</option>
+            </select></span></label>
+        </div>
+        <p class="hint">사장님이 정하는 값이며, 보고서에 그대로 표시되어 인수자도 확인합니다.</p>
+      </fieldset>
+
+      <!-- 시설 -->
+      <fieldset class="f-only">
+        <legend>시설 <span class="s-inline">· 인테리어를 하고 들어왔으면 꼭 넣으세요</span></legend>
+        <div class="row" id="simpleFac">
+          <label for="facCost">시설에 들인 돈 (인테리어·설비 전체)
+            <span class="inp"><input id="facCost" type="number" inputmode="numeric" min="0" placeholder="9000"><span class="u">만원</span></span></label>
+          <label for="facAge">공사한 지 몇 년
+            <span class="inp"><input id="facAge" type="number" inputmode="decimal" min="0" step="0.5" placeholder="3"><span class="u">년</span></span></label>
+        </div>
+        <label class="check"><input type="checkbox" id="detail"> 항목별로 나눠 입력하기</label>
+        <div id="detailFac" hidden>
+          <div class="items" id="items"></div>
+          <button type="button" class="add" id="addItem">+ 항목 추가</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label for="life">시설을 몇 년 쓰는 걸로 볼지
+            <span class="inp"><select id="life">
+              <option value="8">8년 (음식점·카페)</option>
+              <option value="5">5년 (도소매·서비스)</option>
+            </select></span></label>
+        </div>
+        <p class="hint">남은 시설값 = 들인 돈 × (남은 햇수 ÷ 전체 햇수). 감정평가 실무기준의 원가법 방식입니다.</p>
+      </fieldset>
+
+      <fieldset class="sf">
+        <legend>시설권리금</legend>
+        <div class="row">
+          <label for="facRate">남은 시설값 중 받을 비율
+            <span class="inp"><input id="facRate" type="number" inputmode="numeric" min="0" max="100" value="100"><span class="u">%</span></span></label>
+        </div>
+        <p class="hint">시설값을 다 받기 어려운 경우가 많습니다. 남은 시설값 1억원을 5천만원에 넘기려면 50%를 넣으세요.</p>
+      </fieldset>
+
+      <fieldset class="s-only">
+        <legend>가격 조정 (선택)</legend>
+        <div class="row">
+          <label for="adj">계산된 금액에서 더하거나 뺄 금액
+            <span class="inp"><input id="adj" type="number" inputmode="numeric" placeholder="0"><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint">더 받으려면 +, 깎아 주려면 −(예: -1000)를 넣으세요. 보고서에 "양도인 제시 조정"으로 표시됩니다.</p>
+      </fieldset>
+
+      <!-- 인수자 -->
+      <fieldset class="b-only">
+        <legend>제시받은 조건</legend>
+        <div class="row">
+          <label for="offer"><span>상대방이 부른 권리금 <span class="req">*</span></span>
+            <span class="inp"><input id="offer" type="number" inputmode="numeric" min="0" placeholder="13000" data-req-b><span class="u">만원</span></span></label>
+          <label for="newRent">인수 후 월세 (새 임대차계약)
+            <span class="inp"><input id="newRent" type="number" inputmode="numeric" min="0" placeholder="현재 월세와 같음"><span class="u">만원</span></span></label>
+          <label for="floorRate">나갈 때 바닥권리금 회수 예상
+            <span class="inp"><input id="floorRate" type="number" inputmode="numeric" min="0" max="150" value="100"><span class="u">%</span></span></label>
+        </div>
+        <p class="hint">새 임대차계약이면 계약갱신요구권으로 최대 10년 영업할 수 있고, 월세는 새로 정해집니다.</p>
+      </fieldset>
+
+      <fieldset class="bf">
+        <legend>내 업종 기준</legend>
+        <div class="row">
+          <label for="myBiz">들어갈 업종
+            <span class="inp"><input id="myBiz" placeholder="예: 베이커리"></span></label>
+          <label for="reuse">기존 시설 중 다시 쓸 비율
+            <span class="inp"><input id="reuse" type="number" inputmode="numeric" min="0" max="100" value="60"><span class="u">%</span></span></label>
+          <label for="newBuild">같은 시설을 새로 하면 드는 돈
+            <span class="inp"><input id="newBuild" type="number" inputmode="numeric" min="0" placeholder="시설에 들인 돈과 같음"><span class="u">만원</span></span></label>
+          <label for="myProfit">내 업종 예상 월 순수익 (선택)
+            <span class="inp"><input id="myProfit" type="number" inputmode="numeric" min="0" placeholder="넣으면 회수기간 계산"><span class="u">만원</span></span></label>
+        </div>
+      </fieldset>
+    </form>
+
+    <aside class="sticky" id="result">
+      <div class="panel side">
+        <div class="big">
+          <span class="k" id="bigLabel">희망 권리금</span>
+          <span class="v" id="bigValue">-</span>
+          <span class="r" id="bigSub"></span>
+        </div>
+        <div class="cmp s-only" id="cmp"></div>
+        <div class="note" id="note"></div>
+        <div class="bars" id="bars"></div>
+        <dl class="kv" id="kv"></dl>
+        <div class="btns">
+          <button class="btn" type="button" id="shareBtn">상대방에게 링크 보내기</button>
+          <button class="btn ghost" type="button" id="saveImg">보고서 이미지로 저장</button>
+        </div>
+        <p class="hint" style="margin:0" id="shareHint">링크를 받은 사람이 열면 숫자가 채워진 상태로 바로 검토할 수 있어요. 휴대폰에서는 카카오톡 등으로 바로 보낼 수 있어요.</p>
+      </div>
+    </aside>
+  </div>
+
+  <article class="doc" id="doc" aria-label="권리금 보고서"></article>
+</div>
+
+<div class="mbar" id="mbar">
+  <div><span class="k" id="mLabel">희망 권리금</span><span class="v" id="mValue">-</span></div>
+  <button class="btn" type="button" id="mGo">결과 보기</button>
+</div>
+
+<div class="toast" id="toast" role="status"></div>

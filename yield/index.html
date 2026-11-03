@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<title>상가 투자수익률 계산기 | 표면·실질수익률, 대출 레버리지 수익률</title>
+<meta name="description" content="상가 매매가, 보증금, 월세, 공실, 대출을 넣으면 표면수익률과 실투자금 대비 수익률, 대출 이자를 낸 뒤 수익률을 계산합니다." />
+<link rel="canonical" href="%PAGE_URL%" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="상가 투자수익률 계산기" />
+<meta property="og:description" content="상가 매매가, 보증금, 월세, 공실, 대출을 넣으면 표면수익률과 실투자금 대비 수익률, 대출 이자를 낸 뒤 수익률을 계산합니다." />
+<meta property="og:image" content="%SITE_URL%og.png" />
+<meta property="og:url" content="%PAGE_URL%" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" href="%ROOT%favicon.png" />
+<link rel="apple-touch-icon" href="%ROOT%apple-touch-icon.png" />
+</head>
+<body>
+<!--SITE_HEADER-->
+<main class="wrap">
+  <h1 class="page-title">상가 투자수익률 계산기</h1>
+  <p class="page-sub">매매가·보증금·월세를 넣으면 실투자금 대비 수익률과 대출을 쓴 경우의 수익률을 계산합니다.</p>
+  <div class="grid">
+    <form class="panel" id="form" autocomplete="off" novalidate>
+      <fieldset>
+        <legend>매입 조건</legend>
+        <div class="row">
+          <label for="price">매매가
+            <span class="inp"><input id="price" type="number" inputmode="decimal" min="0" placeholder="50000"><span class="u">만원</span></span></label>
+          <label for="deposit">받아 둔 보증금
+            <span class="inp"><input id="deposit" type="number" inputmode="decimal" min="0" placeholder="3000"><span class="u">만원</span></span></label>
+          <label for="monthly">월세 (부가세 제외)
+            <span class="inp"><input id="monthly" type="number" inputmode="decimal" min="0" placeholder="250"><span class="u">만원</span></span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>1년 동안 쓰는 돈과 비는 기간</legend>
+        <div class="row">
+          <label for="vacancy">1년 중 비는 달
+            <span class="inp"><input id="vacancy" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0"><span class="u">개월</span></span></label>
+          <label for="opex">1년 운영비 (재산세·수선비 등)
+            <span class="inp"><input id="opex" type="number" inputmode="decimal" min="0" placeholder="300"><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint">임대인이 내는 재산세, 수선비, 관리 비용을 1년치로 합해 넣으세요. 월세와 별도로 관리비를 받아 그대로 쓰는 경우는 넣지 않습니다.</p>
+      </fieldset>
+      <fieldset>
+        <legend>사는 데 드는 돈 (선택)</legend>
+        <div class="row">
+          <label for="acqPct">취득세 등 (매매가 대비)
+            <span class="inp"><input id="acqPct" type="number" inputmode="decimal" min="0" step="0.1" placeholder="4.6"><span class="u">%</span></span></label>
+          <label for="brokerPct">중개보수 (매매가 대비)
+            <span class="inp"><input id="brokerPct" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.9"><span class="u">%</span></span></label>
+          <label for="extra">그 밖의 비용 (수리·법무 등)
+            <span class="inp"><input id="extra" type="number" inputmode="decimal" min="0" placeholder="0"><span class="u">만원</span></span></label>
+        </div>
+        <p class="hint">칸의 숫자는 입력 예시일 뿐 자동으로 적용되지 않습니다. 취득세율은 상가 종류와 시기에 따라 달라지니 확인해서 넣으세요.</p>
+      </fieldset>
+      <fieldset>
+        <legend>대출 (선택)</legend>
+        <div class="row">
+          <label for="loan">대출금
+            <span class="inp"><input id="loan" type="number" inputmode="decimal" min="0" placeholder="20000"><span class="u">만원</span></span></label>
+          <label for="rate">연 이자율
+            <span class="inp"><input id="rate" type="number" inputmode="decimal" min="0" step="0.1" placeholder="5"><span class="u">%</span></span></label>
+        </div>
+        <p class="hint">이자만 내는 방식으로 계산합니다. 원금 상환은 넣지 않습니다.</p>
+      </fieldset>
+    </form>
+    <aside class="sticky"><div class="stack" id="result"></div></aside>
+  </div>
+  <div class="cta" id="cta" hidden></div>
+
+  <article class="prose" style="padding:0">
+    <h2>수익률 용어 정리</h2>
+    <ul>
+      <li><b>표면수익률</b>: 1년 월세 ÷ 매매가. 보증금과 비용을 빼지 않은 단순 비율입니다.</li>
+      <li><b>실투자금</b>: 매매가에 취득 비용을 더하고 받아 둔 보증금을 뺀 금액입니다. 보증금은 나중에 돌려줘야 하지만, 매입 시점에는 내 돈이 덜 들어갑니다.</li>
+      <li><b>실질수익률(대출 제외)</b>: (1년 월세 − 공실 − 운영비) ÷ 실투자금.</li>
+      <li><b>대출 반영 수익률</b>: 실질 수입에서 대출 이자를 뺀 금액 ÷ 내 돈(실투자금 − 대출). 대출 이자율이 수익률보다 낮으면 수익률이 올라가고, 높으면 내려갑니다.</li>
+    </ul>
+    <div class="ex">매매가 5억, 보증금 3,000만원, 월세 250만원이면 표면수익률은 3,000 ÷ 50,000 = <b>6.0%</b>입니다. 보증금을 빼면 실투자금은 4억 7,000만원이라 같은 월세로 실질 수익률이 더 높게 나옵니다.</div>
+    <h2>계산에 들어가지 않는 것</h2>
+    <p>보유 중 내는 세금(재산세 외 종합소득세·건강보험료 등), 팔 때의 양도세, 가격 변동은 계산하지 않습니다. 월세가 오르거나 내리는 것도 반영하지 않으므로 투자 판단 전에 세무사·중개사와 따로 확인하세요.</p>
+    <p class="src">입력한 숫자를 그대로 계산하는 도구이며, 투자 권유나 수익 보장이 아닙니다.</p>
+  </article>
+</main>
+<!--SITE_FOOTER-->
+<script type="module" src="../src/yield.js"></script>
+</body>
+</html>

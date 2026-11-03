@@ -1,0 +1,29 @@
+{
+  "name": "gwongrigeum",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build && ait build",
+    "preview": "vite preview",
+    "deploy": "ait deploy"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "^3.9.0",
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "@apps-in-toss/devtools": "^3.9.0",
+    "@eslint/js": "^9.25.0",
+    "eslint": "^9.25.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^5.4.21"
+  },
+  "description": "권리금 계산기 앱인토스 미니앱",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

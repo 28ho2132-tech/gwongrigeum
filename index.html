@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<title>상가 계산기 | 권리금·중개보수·상가임대차보호법·투자수익률</title>
+<meta name="description" content="상가를 넘기거나 구하거나 투자할 때 필요한 계산을 한곳에. 권리금, 중개보수(복비), 상가임대차보호법 보호 범위와 갱신 기간, 투자수익률, 창업 손익분기를 계산합니다." />
+<link rel="canonical" href="%PAGE_URL%" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="상가 계산기" />
+<meta property="og:description" content="권리금, 중개보수, 상가임대차보호법, 투자수익률, 손익분기를 한곳에서 계산합니다." />
+<meta property="og:image" content="%SITE_URL%og.png" />
+<meta property="og:url" content="%PAGE_URL%" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/png" href="%ROOT%favicon.png" />
+<link rel="apple-touch-icon" href="%ROOT%apple-touch-icon.png" />
+<script>/* 예전에 공유한 권리금 링크(?d=...)는 권리금 계산기로 보냅니다 */
+if (/[?&]d=/.test(location.search)) location.replace('./goodwill/' + location.search);</script>
+</head>
+<body>
+<!--SITE_HEADER-->
+<main class="wrap">
+  <section class="hero">
+    <h1>상가를 넘기고, 구하고, 투자할 때<br>필요한 계산을 한곳에서</h1>
+    <p>상가 중개 현장에서 자주 받는 질문들을 계산기로 만들었습니다. 숫자를 넣으면 계산 근거와 함께 결과가 나옵니다. 설치도 가입도 필요 없습니다.</p>
+  </section>
+
+  <section class="cards" aria-label="계산기 목록">
+    <a class="card" href="./goodwill/"><b>권리금 계산기</b><span>바닥·영업·시설 권리금을 나눠 계산하고, 상대방에게 건넬 근거 보고서를 만듭니다. 인수하는 쪽은 몇 개월 만에 회수하는지 확인합니다.</span><em>계산하기 →</em></a>
+    <a class="card" href="./brokerage/"><b>중개보수(복비) 계산기</b><span>상가·토지 임대차와 매매의 중개보수 상한을 계산합니다. 월세를 보증금으로 환산하는 방법까지 보여 줍니다.</span><em>계산하기 →</em></a>
+    <a class="card" href="./protection/"><b>상가임대차보호법 계산·정리</b><span>내 계약에 법이 적용되는지, 월세를 얼마까지 올릴 수 있는지, 언제 갱신을 요구할 수 있는지 확인합니다.</span><em>확인하기 →</em></a>
+    <a class="card" href="./yield/"><b>상가 투자수익률 계산기</b><span>매매가, 보증금, 월세, 대출을 넣고 표면수익률과 내 돈 기준 수익률, 월 현금흐름을 봅니다.</span><em>계산하기 →</em></a>
+    <a class="card" href="./breakeven/"><b>창업 손익분기 계산기</b><span>월세·인건비·원가를 넣고 한 달에 얼마를 팔아야 본전인지, 투자금은 언제 회수되는지 계산합니다.</span><em>계산하기 →</em></a>
+  </section>
+
+  <section>
+    <h2 class="sect-title">이런 분께 맞습니다</h2>
+    <div class="who">
+      <div><b>가게를 넘기려는 사장님</b><p>권리금을 얼마로 부를지 근거를 정리하고, 인수자가 회수기간을 따져 볼 때 설득할 자료를 만듭니다.</p></div>
+      <div><b>상가를 구하는 창업자</b><p>월세와 권리금을 넣고 손익분기를 보고, 중개보수와 갱신 기간까지 계약 전에 확인합니다.</p></div>
+      <div><b>상가에 투자하려는 분</b><p>대출을 끼웠을 때 수익률이 어떻게 달라지는지, 매달 손에 남는 돈은 얼마인지 계산합니다.</p></div>
+    </div>
+  </section>
+
+  <section class="prose" style="padding:0;margin-top:34px">
+    <h2>계산 결과를 볼 때 알아 두세요</h2>
+    <ul>
+      <li>법령과 요율은 <b>2026년 11월 3일</b> 기준으로 확인했습니다. 법은 바뀔 수 있으니 계약 전에 국가법령정보센터에서 다시 확인하세요.</li>
+      <li>계산기는 입력하신 값으로만 계산합니다. 좋다·나쁘다는 판단은 하지 않고, 판단에 필요한 숫자와 근거를 보여 드립니다.</li>
+      <li>입력하신 내용은 이 기기에만 저장되고 서버로 전송되지 않습니다.</li>
+    </ul>
+  </section>
+  <div class="cta" id="cta" hidden></div>
+</main>
+<!--SITE_FOOTER-->
+<script type="module" src="./src/common.js"></script>
+</body>
+</html>
