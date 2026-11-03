@@ -1,5 +1,75 @@
 // 화면과 무관한 순수 계산 함수 모음 (금액 단위: 만원). 검산용 테스트가 이 파일을 그대로 불러 씁니다.
 
+/* ---------- 권리금 ---------- */
+// goodwill.js에서 읽은 숫자와 선택값만 받습니다. 비율 결과는 기존 화면처럼 1 = 100%입니다.
+export function goodwillCalc(input) {
+  const {
+    type: t, mode = 'seller', floor = 0, deposit = 0, rent = 0, mgmt = 0,
+    sales = 0, detail = false, cogs = 0, wage = 0, etc = 0, profit = 0,
+    ownerMode = 'work', owner = 0, months = 0, basis = 'op',
+    items = [], life = 0, facRate = 0, offer = 0, adj = 0, floorRate = 0,
+    reuse = 0, myProfit = 0,
+  } = input;
+  const c = { t, floor, deposit, rent, mgmt };
+  const buyer = mode === 'buyer';
+  c.newRent = buyer && input.newRent !== undefined ? input.newRent : c.rent;
+  c.rentUp = buyer ? Math.max(0, c.newRent - c.rent) : 0;
+  if (t === 'g') {
+    c.sales = sales;
+    c.detail = detail;
+    c.op = c.detail ? c.sales - cogs - wage - etc - c.rent - c.mgmt : profit;
+    c.ownerCost = ownerMode === 'auto' ? 0 : owner;
+    c.excess = c.op - c.ownerCost;
+    c.months = Math.max(0, months);
+    c.basis = basis;
+    c.base = Math.max(0, c.basis === 'op' ? c.op : c.excess);
+    c.core = c.base * c.months;
+  } else {
+    c.items = items.map(function(item) {
+      return { name: item.name, cost: item.cost, age: item.age,
+        res: item.cost * Math.max(0, 1 - item.age / life) };
+    });
+    c.costSum = c.items.reduce(function(a,b){return a+b.cost;},0);
+    c.facility = c.items.reduce(function(a,b){return a+b.res;},0);
+    c.facRate = Math.min(100, Math.max(0, facRate));
+    c.core = c.facility * c.facRate / 100;
+  }
+  c.computed = c.floor + c.core;
+  c.price = buyer ? offer : Math.max(0, c.computed + adj);
+  c.adj = c.price - c.computed;
+  c.floorIn = Math.min(c.price, c.floor);
+  c.nonFloor = Math.max(0, c.price - c.floorIn);
+  c.floorRate = buyer ? floorRate : 100;
+  c.recover = c.floorIn * c.floorRate / 100;
+  c.consumable = Math.max(0, c.price - c.recover);
+  if (t === 'g') {
+    c.opB = c.op - c.rentUp; c.exB = c.excess - c.rentUp;
+    c.nonFloorOpMonths = c.op > 0 ? (c.price - c.floorIn) / c.op : Infinity;
+    c.payback = c.consumable === 0 ? 0 : (c.exB > 0 ? c.consumable / c.exB : Infinity);
+    c.fullPayback = c.exB > 0 ? c.price / c.exB : Infinity;
+    c.opMonths = c.opB > 0 ? c.consumable / c.opB : Infinity;
+    c.exMonths = c.exB > 0 ? c.consumable / c.exB : Infinity;
+    c.per = c.opB > 0 ? c.price / (c.opB * 12) : Infinity;
+    c.psr = c.sales > 0 ? c.price / (c.sales * 12) : Infinity;
+    c.margin = c.sales > 0 ? c.opB / c.sales : NaN;
+    c.rentRatio = c.sales > 0 ? (c.newRent + c.mgmt) / c.sales : NaN;
+    c.yld = (c.price + c.deposit) > 0 ? c.exB * 12 / (c.price + c.deposit) : NaN;
+  } else {
+    c.facShare = c.nonFloor;
+    c.pbr = (c.floor + c.facility) > 0 ? c.price / (c.floor + c.facility) : Infinity;
+    c.costRatio = c.costSum > 0 ? c.facShare / c.costSum : NaN;
+    if (buyer) {
+      c.newBuild = input.newBuild !== undefined ? input.newBuild : c.costSum;
+      c.reuse = Math.min(100, Math.max(0, reuse));
+      c.saved = c.newBuild * c.reuse / 100;
+      c.diff = c.facShare - c.saved;
+      c.myProfit = myProfit;
+      c.payback = c.myProfit > 0 ? c.consumable / c.myProfit : NaN;
+    }
+  }
+  return c;
+}
+
 /* ---------- 중개보수 (공인중개사법 시행규칙 제20조 제4항: 주택 외 중개대상물) ---------- */
 export const BROKER_CAP = 0.9; // 상한요율(%), 거래금액의 1천분의 9 이내에서 협의
 

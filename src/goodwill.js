@@ -1,4 +1,5 @@
 import './common.js';
+import { goodwillCalc } from './calc.js';
 import body from './body.html?raw';
 import { kv, shareToBuyer, readSharedData, saveReportImage } from './toss.js';
 
@@ -64,11 +65,10 @@ await kv.init(['gw_draft_v1']);
     $("items").appendChild(d);
   }
   function items(){
-    var life = num("life");
-    if(!$("detail").checked){ var cc = num("facCost"), aa = num("facAge"); return [{name:"시설 일체", cost:cc, age:aa, res: cc * Math.max(0, 1 - aa/life)}]; }
+    if(!$("detail").checked){ var cc = num("facCost"), aa = num("facAge"); return [{name:"시설 일체", cost:cc, age:aa}]; }
     return Array.prototype.map.call(document.querySelectorAll("#items .item"), function(d){
       var cost = val(d.querySelector(".icost")), age = val(d.querySelector(".iage"));
-      return {name: d.querySelector(".iname").value || "시설", cost: cost, age: age, res: cost * Math.max(0, 1 - age/life)};
+      return {name: d.querySelector(".iname").value || "시설", cost: cost, age: age};
     });
   }
   function gReady(){ return $("plDetail").checked ? has("sales") : has("profit"); }
@@ -76,59 +76,25 @@ await kv.init(['gw_draft_v1']);
 
   /* ---------- 계산 ---------- */
   function calc(t){
-    var c = {t:t, floor:num("floor"), deposit:num("deposit"), rent:num("rent"), mgmt:num("mgmt")};
-    var buyer = mode === "buyer";
-    c.newRent = buyer && has("newRent") ? num("newRent") : c.rent;
-    c.rentUp = buyer ? Math.max(0, c.newRent - c.rent) : 0;
+    var input = {
+      type:t, mode:mode, floor:num("floor"), deposit:num("deposit"), rent:num("rent"), mgmt:num("mgmt"),
+      newRent:has("newRent") ? num("newRent") : undefined,
+      offer:num("offer"), adj:num("adj"), floorRate:num("floorRate")
+    };
     if(t === "g"){
-      c.sales = num("sales");
-      c.detail = $("plDetail").checked;
-      c.op = c.detail ? c.sales - num("cogs") - num("wage") - num("etc") - c.rent - c.mgmt : num("profit");
-      c.ownerCost = $("ownerMode").value === "auto" ? 0 : num("owner");
-      c.excess = c.op - c.ownerCost;
-      c.months = Math.max(0, num("months"));
-      c.basis = $("basis").value;
-      c.base = Math.max(0, c.basis === "op" ? c.op : c.excess);
-      c.core = c.base * c.months;
+      Object.assign(input, {
+        sales:num("sales"), detail:$("plDetail").checked,
+        cogs:num("cogs"), wage:num("wage"), etc:num("etc"), profit:num("profit"),
+        ownerMode:$("ownerMode").value, owner:num("owner"), months:num("months"), basis:$("basis").value
+      });
     } else {
-      c.items = items();
-      c.costSum = c.items.reduce(function(a,b){return a+b.cost;},0);
-      c.facility = c.items.reduce(function(a,b){return a+b.res;},0);
-      c.facRate = Math.min(100, Math.max(0, num("facRate")));
-      c.core = c.facility * c.facRate / 100;
+      Object.assign(input, {
+        items:items(), life:num("life"), facRate:num("facRate"),
+        newBuild:has("newBuild") ? num("newBuild") : undefined,
+        reuse:num("reuse"), myProfit:num("myProfit")
+      });
     }
-    c.computed = c.floor + c.core;
-    c.price = buyer ? num("offer") : Math.max(0, c.computed + num("adj"));
-    c.adj = c.price - c.computed;
-    c.floorIn = Math.min(c.price, c.floor);
-    c.floorRate = buyer ? num("floorRate") : 100;
-    c.recover = c.floorIn * c.floorRate / 100;
-    c.consumable = Math.max(0, c.price - c.recover);
-    if(t === "g"){
-      c.opB = c.op - c.rentUp; c.exB = c.excess - c.rentUp;
-      c.payback = c.consumable === 0 ? 0 : (c.exB > 0 ? c.consumable / c.exB : Infinity);
-      c.fullPayback = c.exB > 0 ? c.price / c.exB : Infinity;
-      c.opMonths = c.opB > 0 ? c.consumable / c.opB : Infinity;
-      c.exMonths = c.exB > 0 ? c.consumable / c.exB : Infinity;
-      c.per = c.opB > 0 ? c.price / (c.opB * 12) : Infinity;
-      c.psr = c.sales > 0 ? c.price / (c.sales * 12) : Infinity;
-      c.margin = c.sales > 0 ? c.opB / c.sales : NaN;
-      c.rentRatio = c.sales > 0 ? (c.newRent + c.mgmt) / c.sales : NaN;
-      c.yld = (c.price + c.deposit) > 0 ? c.exB * 12 / (c.price + c.deposit) : NaN;
-    } else {
-      c.facShare = Math.max(0, c.price - c.floorIn);
-      c.pbr = (c.floor + c.facility) > 0 ? c.price / (c.floor + c.facility) : Infinity;
-      c.costRatio = c.costSum > 0 ? c.facShare / c.costSum : NaN;
-      if(buyer){
-        c.newBuild = has("newBuild") ? num("newBuild") : c.costSum;
-        c.reuse = Math.min(100, Math.max(0, num("reuse")));
-        c.saved = c.newBuild * c.reuse / 100;
-        c.diff = c.facShare - c.saved;
-        c.myProfit = num("myProfit");
-        c.payback = c.myProfit > 0 ? c.consumable / c.myProfit : NaN;
-      }
-    }
-    return c;
+    return goodwillCalc(input);
   }
 
   /* ---------- 빠진 입력 ---------- */
@@ -195,7 +161,7 @@ await kv.init(['gw_draft_v1']);
     $("note").className = "note";
     var parts = "바닥 " + won(c.floor) + " + " + (type==="g" ? "영업 " : "시설 ") + won(c.core);
     if(seller) $("bigSub").textContent = parts + (c.adj ? (c.adj > 0 ? " + 조정 " : " − 조정 ") + won(Math.abs(c.adj)) : "");
-    else $("bigSub").textContent = "= 바닥 " + won(c.floorIn) + " + " + (type==="g" ? "영업 몫 " + won(Math.max(0,c.price-c.floorIn)) + (c.op > 0 ? " (월 순수익 " + r1((c.price-c.floorIn)/c.op) + "개월치)" : "") : "시설 몫 " + won(c.facShare));
+    else $("bigSub").textContent = "= 바닥 " + won(c.floorIn) + " + " + (type==="g" ? "영업 몫 " + won(c.nonFloor) + (c.op > 0 ? " (월 순수익 " + r1(c.nonFloorOpMonths) + "개월치)" : "") : "시설 몫 " + won(c.facShare));
 
     if(type === "g"){
       $("note").innerHTML = (seller ? "인수자 " : "") + "실제 회수기간 <b>" + mo(c.payback) + "</b><br><span style=\"font-size:12px;color:var(--muted)\">바닥권리금 빼고, 사람 쓰는 비용 뺀 이익 기준</span>";
@@ -215,7 +181,7 @@ await kv.init(['gw_draft_v1']);
       if(!seller) kv.push(["회수기간", c.myProfit > 0 ? mo(c.payback) : "예상 순수익 미입력"]);
       kv.push(["PBR", isFinite(c.pbr) ? r2(c.pbr) + "배" : "-"]);
     }
-    var a = seller ? c.floor : c.floorIn, b = seller ? c.core : Math.max(0, c.price - c.floorIn), max = Math.max(1, a, b);
+    var a = seller ? c.floor : c.floorIn, b = seller ? c.core : c.nonFloor, max = Math.max(1, a, b);
     $("bars").innerHTML = bar("바닥권리금", a, max) + bar(type==="g" ? (seller ? "영업권리금" : "영업 몫") : (seller ? "시설권리금" : "시설 몫"), b, max);
     $("kv").innerHTML = kv.map(function(x){ return "<dt>" + x[0] + "</dt><dd>" + x[1] + "</dd>"; }).join("");
   }

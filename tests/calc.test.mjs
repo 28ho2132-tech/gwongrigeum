@@ -46,4 +46,77 @@ eq(b.targetSales, (1080 + 200) / 0.65, '목표 매출'); eq(b.payback, 9000 / (2
 eq(b.daily, 1080 / 0.65 / 26, '일 매출'); eq(b.customers, (1080 / 0.65) * 10000 / 26 / 8000, '일 고객');
 assert.equal(c.breakeven({ varPct: 100, rent: 100 }).be, Infinity);
 assert.equal(c.breakeven({ rent: 100, varPct: 30, sales: 100, initial: 500 }).payback, Infinity); // 적자면 회수 불가
+// 권리금 정답표: 금액은 만원, 기간은 개월. 화면의 반올림 방식도 그대로 확인합니다.
+const goodwill = c.goodwillCalc({
+  type: 'g', floor: 3000, profit: 500, owner: 300,
+  months: 10, basis: 'op', deposit: 5000,
+});
+assert.equal(goodwill.core, 5000);
+assert.equal(goodwill.price, 8000);
+assert.equal(goodwill.floorIn, 3000);
+assert.equal(goodwill.recover, 3000);
+assert.equal(goodwill.consumable, 5000);
+assert.equal(goodwill.rentUp, 0);
+assert.equal(goodwill.payback, 25);
+assert.equal(goodwill.fullPayback, 40);
+assert.equal(Math.round(goodwill.per * 100) / 100, 1.33);
+assert.equal(Math.round(goodwill.yld * 1000) / 10, 18.5);
+
+const facility = c.goodwillCalc({
+  type: 'f', floor: 3000, life: 8, facRate: 100,
+  items: [{ name: '시설 일체', cost: 6000, age: 2 }],
+});
+assert.equal(facility.items[0].res, 4500);
+assert.equal(facility.core, 4500);
+assert.equal(facility.price, 7500);
+assert.equal(facility.pbr, 1);
+assert.equal(facility.facShare, 4500);
+
+// 인수자 월세 인상, 상세 손익, 자동 운영, 다른 수익배수 기준을 확인합니다.
+const buyerGoodwill = c.goodwillCalc({
+  type: 'g', mode: 'buyer', floor: 3000, deposit: 5000,
+  rent: 200, newRent: 250, mgmt: 30, sales: 2000, detail: true,
+  cogs: 600, wage: 400, etc: 270, owner: 300,
+  months: 10, basis: 'excess', offer: 8000, floorRate: 50,
+});
+assert.equal(buyerGoodwill.op, 500);
+assert.equal(buyerGoodwill.core, 2000);
+assert.equal(buyerGoodwill.rentUp, 50);
+assert.equal(buyerGoodwill.recover, 1500);
+assert.equal(buyerGoodwill.consumable, 6500);
+assert.equal(buyerGoodwill.nonFloor, 5000);
+assert.equal(buyerGoodwill.nonFloorOpMonths, 10);
+eq(buyerGoodwill.payback, 6500 / 150, '인수자 실제 회수기간');
+eq(buyerGoodwill.per, 8000 / (450 * 12), '인수자 PER');
+eq(buyerGoodwill.psr, 8000 / (2000 * 12), 'PSR');
+eq(buyerGoodwill.margin, 450 / 2000, '영업이익률');
+eq(buyerGoodwill.rentRatio, 280 / 2000, '임대료 비중');
+eq(buyerGoodwill.yld, 150 * 12 / 13000, '인수자 연 수익률');
+const autoGoodwill = c.goodwillCalc({ type: 'g', ownerMode: 'auto', owner: 300, profit: 500, months: 10 });
+assert.equal(autoGoodwill.ownerCost, 0);
+assert.equal(autoGoodwill.payback, 10);
+
+// 시설형 인수자의 재사용 비교와 입력 객체가 변경되지 않는지 확인합니다.
+const facilityInput = Object.freeze({
+  type: 'f', mode: 'buyer', floor: 3000, offer: 7500, floorRate: 100,
+  life: 8, facRate: 100, reuse: 60, myProfit: 300,
+  items: Object.freeze([Object.freeze({ name: '시설 일체', cost: 6000, age: 2 })]),
+});
+const buyerFacility = c.goodwillCalc(facilityInput);
+assert.equal(buyerFacility.newBuild, 6000);
+assert.equal(buyerFacility.saved, 3600);
+assert.equal(buyerFacility.diff, 900);
+assert.equal(buyerFacility.payback, 15);
+assert.equal(buyerFacility.costRatio, 0.75);
+assert.deepEqual(c.goodwillCalc(facilityInput), buyerFacility);
+assert.equal('res' in facilityInput.items[0], false);
+
+// 기존의 0·적자·수명 초과·비율 보정 동작을 바꾸지 않습니다.
+assert.equal(c.goodwillCalc({ type: 'g', profit: 100, owner: 300, months: 10 }).payback, Infinity);
+assert.equal(c.goodwillCalc({ type: 'g', floor: 3000 }).payback, 0);
+assert.ok(Number.isNaN(c.goodwillCalc({ type: 'g' }).yld));
+assert.equal(c.goodwillCalc({ type: 'f', life: 8, items: [{ cost: 6000, age: 10 }] }).facility, 0);
+assert.equal(c.goodwillCalc({ type: 'f', facRate: 150 }).facRate, 100);
+assert.equal(c.goodwillCalc({ type: 'g', months: -10 }).months, 0);
+assert.equal(c.goodwillCalc({ type: 'g', mode: 'buyer', rent: 200, newRent: 100 }).rentUp, 0);
 console.log('계산 검산 모두 통과');
